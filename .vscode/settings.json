@@ -1,0 +1,7 @@
+{
+    "typescript.format.semicolons": "remove",
+    "javascript.format.semicolons": "remove",
+    "cSpell.words": [
+        "sqlx"
+    ]
+}
