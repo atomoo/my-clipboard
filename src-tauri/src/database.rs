@@ -4,8 +4,8 @@ use std::{str::FromStr};
 
 use convert_case::{Casing, Case};
 use serde::{Serializer, Serialize};
-use sqlx::{ConnectOptions, SqliteConnection, Executor, Any, SqlitePool, Row, Column, Value};
-use sqlx::sqlite::SqliteConnectOptions;
+use sqlx::{ConnectOptions, SqliteConnection, Executor, Any, SqlitePool, Row, Column, Value, Arguments, Sqlite};
+use sqlx::sqlite::{SqliteConnectOptions, SqliteArguments};
 use sqlx::migrate::MigrateDatabase;
 use tauri::State;
 use sqlx::{ValueRef};
@@ -82,10 +82,7 @@ impl Serialize for Error {
     }
 }
 
-#[tauri::command]
-pub async fn get_clipboard_contents(state: tauri::State<'_, Database>) -> Result<Vec<HashMap<String, String>>, Error> {
-    let db_lock = state.pool.lock().await;
-    let pool = db_lock.get("sqlite").unwrap().as_ref().unwrap();
+pub async fn query_all_clipboard(pool: &sqlx::Pool<Sqlite>) -> Result<Vec<HashMap<String, String>>, Error> {
     let result = sqlx::query("SELECT * FROM clipboard").fetch_all(pool).await.unwrap();
     let mut list = Vec::new();
     for rec in result {
@@ -102,3 +99,21 @@ pub async fn get_clipboard_contents(state: tauri::State<'_, Database>) -> Result
     Ok(list)
 }
 
+#[tauri::command]
+pub async fn get_clipboard_contents(state: tauri::State<'_, Database>) -> Result<Vec<HashMap<String, String>>, Error> {
+    let db_lock = state.pool.lock().await;
+    let pool = db_lock.get("sqlite").unwrap().as_ref().unwrap();
+    query_all_clipboard(pool).await
+}
+
+pub async fn save_cur_clipboard(state: tauri::State<'_, Database>, content: String) -> Result<Vec<HashMap<String, String>>, Error> {
+    let db_lock = state.pool.lock().await;
+    let pool = db_lock.get("sqlite").unwrap().as_ref().unwrap();
+    let mut args = SqliteArguments::default();
+    args.add(content);
+    sqlx::query_with(r#"INSERT INTO clipboard(content), values(?1)"#, args)
+        .execute(pool)
+        .await.unwrap()
+        .last_insert_rowid();
+    query_all_clipboard(pool).await
+}

@@ -1,55 +1,30 @@
 'use client'
 
-import {clipboard, invoke} from '@tauri-apps/api'
-import {useCallback, useEffect, useRef, useState} from 'react'
+import {invoke} from '@tauri-apps/api'
+import {useCallback} from 'react'
 
-import {PACKAGE_LIST, getPackageVersion} from '@/utils/package'
 import SysIcon from '@/icon/system.svg'
+import {usePackage} from '@/hooks/package'
+import {useClipboard} from '@/hooks/clipboard'
 
-async function getPackageList() {
-  return Promise.all(PACKAGE_LIST.map(async item => {
-    const version = await getPackageVersion(item)
-    return {...item, version}
-  }))
+
+function getClipboardContents() {
+  return invoke('get_clipboard_contents') as Promise<any[]>
 }
 
 
 export default function Home() {
-  const [list, setList] = useState<any[]>([])
-  const timerRef= useRef<any>(0)
-  useEffect(
-    () => {
-      getPackageList().then(list => {
-        setList(list)
-      })
+  const packageList = usePackage()
+  const clipboardContents = useClipboard()
+
+  const click = useCallback(
+    async () => {
+      const result = await getClipboardContents()
+      console.log(result)
     },
     []
   )
 
-  // useEffect(
-  //   () => {
-  //     const timer = timerRef.current
-  //     if (!timerRef.current) {
-  //       timerRef.current = setInterval(() => {
-  //         clipboard.readText().then(console.log)
-  //       }, 1000)
-  //       console.log(timerRef.current)
-  //     }
-  //     return () => {
-  //       clearInterval(timer)
-  //     }
-  //   },
-  //   []
-  // )
-
-  const click = useCallback(
-    () => {
-      invoke('get_clipboard_contents').then(result => {
-        console.log(result)
-      }).catch(console.error)
-    }, 
-    []
-  )
   return (
     <main className="flex min-h-screen flex-col items-center justify-between pb-4 rounded-md bg-white shadow-sm">
       <div>
@@ -60,7 +35,7 @@ export default function Home() {
           <SysIcon />
         </div>
         <div className="flex-1 pl-2">
-        {list.map(item => {
+        {packageList.map(item => {
           return (
             <div className="flex items-center" key={item.name}>
               <span className="text-sm mr-1">{item.icon}</span>

@@ -11,6 +11,7 @@ use tauri::{
 use tauri_plugin_positioner::{self, Position, WindowExt};
 use tokio::time::sleep;
 mod database;
+mod clipboard;
 
 fn main() {
     dotenv::dotenv().ok();
@@ -35,6 +36,7 @@ fn main() {
             });
             spawn(async move {
                 println!("sleep start");
+                clipboard::clipboard_task(&handle).await;
                 sleep(Duration::from_secs(10)).await;
                 let database = handle.state::<database::Database>();
                 println!("sleep end");

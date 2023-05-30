@@ -3,7 +3,6 @@ import {Command} from '@tauri-apps/api/shell'
 
 import NodeIcon from '@/icon/node.svg'
 
-
 export const VERSION_PATTER = '[0-9]+\.[0-9]+\.[0-9]+'
 export const PACKAGE_LIST: Package[] = [
     {
