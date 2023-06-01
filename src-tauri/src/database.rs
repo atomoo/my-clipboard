@@ -111,7 +111,7 @@ pub async fn save_cur_clipboard(state: tauri::State<'_, Database>, content: Stri
     let pool = db_lock.get("sqlite").unwrap().as_ref().unwrap();
     let mut args = SqliteArguments::default();
     args.add(content);
-    sqlx::query_with(r#"INSERT INTO clipboard(content), values(?1)"#, args)
+    sqlx::query_with(r#"INSERT INTO clipboard(content) VALUES(?1)"#, args)
         .execute(pool)
         .await.unwrap()
         .last_insert_rowid();

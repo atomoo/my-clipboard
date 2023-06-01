@@ -9,7 +9,6 @@ use tauri::{
     Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, CustomMenuItem,
 };
 use tauri_plugin_positioner::{self, Position, WindowExt};
-use tokio::time::sleep;
 mod database;
 mod clipboard;
 
@@ -35,11 +34,7 @@ fn main() {
                 }
             });
             spawn(async move {
-                println!("sleep start");
                 clipboard::clipboard_task(&handle).await;
-                sleep(Duration::from_secs(10)).await;
-                let database = handle.state::<database::Database>();
-                println!("sleep end");
             });
             Ok(())
         })
@@ -78,7 +73,7 @@ fn main() {
                 if !is_focused {
                     event.window().hide().unwrap();
                 }
-            }
+            },
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![database::get_clipboard_contents])

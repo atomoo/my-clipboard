@@ -6,6 +6,7 @@ import {useCallback} from 'react'
 import SysIcon from '@/icon/system.svg'
 import {usePackage} from '@/hooks/package'
 import {useClipboard} from '@/hooks/clipboard'
+import ClipboardView from '@/components/ClipboardView'
 
 
 function getClipboardContents() {
@@ -16,20 +17,10 @@ function getClipboardContents() {
 export default function Home() {
   const packageList = usePackage()
   const clipboardContents = useClipboard()
-
-  const click = useCallback(
-    async () => {
-      const result = await getClipboardContents()
-      console.log(result)
-    },
-    []
-  )
-
+  console.log(clipboardContents)
   return (
     <main className="flex min-h-screen flex-col items-center justify-between pb-4 rounded-md bg-white shadow-sm">
-      <div>
-        <button onClick={click}>click</button>
-      </div>
+      <ClipboardView data={clipboardContents} />
       <div className="z-10 fixed bottom-0 right-0 w-full border-t text-xs flex items-center">
         <div className="flex-shrink-0 p-1 border-r">
           <SysIcon />

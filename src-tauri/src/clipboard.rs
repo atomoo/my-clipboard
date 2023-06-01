@@ -10,6 +10,8 @@ pub async fn clipboard_task(app_handle: &AppHandle) {
     loop {
         interval.tick().await;
         let content = app_handle.clipboard_manager().read_text().unwrap().unwrap();
+        println!("read clipboard");
+        println!("content: {}, {}", content.to_string(),prev);
         if !content.is_empty() && content != "" && content != prev {
             let database = app_handle.state::<Database>();
             prev = content.clone();
