@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::{env, time::Duration};
+use std::{env};
 
 use sqlx::Connection;
 use tauri::{
@@ -22,7 +22,6 @@ fn main() {
         .setup(move |app| {
             let handle = app.app_handle();
             block_on(async {
-                println!("spawn:>>>");
                 let result = database::init(&db_url).await;
                 match result {
                     Ok(connection) => {
@@ -33,9 +32,9 @@ fn main() {
                     Err(e) => println!("error: {}", e),
                 }
             });
-            spawn(async move {
-                clipboard::clipboard_task(&handle).await;
-            });
+            // spawn(async move {
+            //     clipboard::clipboard_task(&handle).await;
+            // });
             Ok(())
         })
         .plugin(tauri_plugin_positioner::init())
@@ -70,6 +69,7 @@ fn main() {
         .on_window_event(|event| match event.event() {
             tauri::WindowEvent::Focused(is_focused) => {
                 // detect click outside of the focused window and hide the app
+                #[cfg(not(debug_assertions))]
                 if !is_focused {
                     event.window().hide().unwrap();
                 }

@@ -19,7 +19,7 @@ export default function Home() {
   const clipboardContents = useClipboard()
   console.log(clipboardContents)
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between pb-4 rounded-md bg-white shadow-sm">
+    <main className="flex min-h-screen flex-col items-center justify-between pb-4 rounded-md bg-white shadow">
       <ClipboardView data={clipboardContents} />
       <div className="z-10 fixed bottom-0 right-0 w-full border-t text-xs flex items-center">
         <div className="flex-shrink-0 p-1 border-r">
